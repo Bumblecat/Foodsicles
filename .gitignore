@@ -4,13 +4,22 @@
 # Log file
 *.log
 
-# BlueJ files
-*.ctxt
+# Eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Intellij Idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -19,5 +28,25 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Gradle
+build
+.gradle
+
+# Photoshop
+*.psd
+
+# Cubik Studio
+*.cubik
+
+# Other files.
+eclipse
+run
+
+# Files from Forge MDK
+forge*changelog.txt
+
+# MacOS
+.DS_Store
