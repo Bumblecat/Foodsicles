@@ -117,6 +117,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${fg_version}"
+
+    implementation fg.deobf("dev.bumblecat.bumblecore:bumblecore:${mc_version}-${bc_version}")
 }
 
 jar {
