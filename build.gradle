@@ -112,7 +112,7 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-  mavenLocal()
+    mavenLocal()
 }
 
 dependencies {
