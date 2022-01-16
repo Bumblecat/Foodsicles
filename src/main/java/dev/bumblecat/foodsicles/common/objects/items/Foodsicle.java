@@ -66,7 +66,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
                      * If the inventory is empty, play a soundeffect. If not, start consuming!
                      */
                     if (!getInventory(player.getItemInHand(hand)).isEmpty()) {
-                        System.out.println("start using the item.");
                         player.startUsingItem(hand);
                     } else {
                         level.playSound(null, player.getX(), player.getY(), player.getZ(),

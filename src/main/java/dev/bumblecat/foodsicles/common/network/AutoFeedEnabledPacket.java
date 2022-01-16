@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 public class AutoFeedEnabledPacket {
 
-    private boolean value;
+    private final boolean value;
 
 
     public AutoFeedEnabledPacket(boolean value) {

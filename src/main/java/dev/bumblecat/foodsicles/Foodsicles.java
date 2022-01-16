@@ -62,7 +62,7 @@ public class Foodsicles extends Module {
     public void onCommonSetupEvent(FMLCommonSetupEvent event) {
         super.onCommonSetupEvent(event);
 
-        creativeTab.setIconItem(new ItemStack((Foodsicle) FS_OBJECT));
+        creativeTab.setIconItem(new ItemStack(FS_OBJECT));
         creativeTab.setEnchantmentCategories(AutoFeedEnchantment.Category);
 
         getNetwork().registerMessage(AutoFeedEnabledPacket.class, AutoFeedEnabledPacket::encode, AutoFeedEnabledPacket::decode, AutoFeedEnabledPacket::handle);

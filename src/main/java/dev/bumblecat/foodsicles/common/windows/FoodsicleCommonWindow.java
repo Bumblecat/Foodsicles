@@ -3,7 +3,6 @@ package dev.bumblecat.foodsicles.common.windows;
 import dev.bumblecat.bumblecore.common.storage.IInventory;
 import dev.bumblecat.bumblecore.common.windows.CommonWindow;
 import dev.bumblecat.foodsicles.Foodsicles;
-import dev.bumblecat.foodsicles.common.network.AutoFeedEnabledPacket;
 import dev.bumblecat.foodsicles.common.objects.items.IFoodsicle;
 
 import net.minecraft.nbt.CompoundTag;
