@@ -3,6 +3,7 @@ package dev.bumblecat.foodsicles;
 import dev.bumblecat.bumblecore.common.Functions;
 import dev.bumblecat.bumblecore.common.modular.Module;
 import dev.bumblecat.bumblecore.common.objects.CreativeTab;
+import dev.bumblecat.bumblecore.common.objects.items.CustomItem;
 import dev.bumblecat.bumblecore.common.objects.items.Variables;
 import dev.bumblecat.bumblecore.common.register.Registry;
 import dev.bumblecat.foodsicles.client.windows.FoodsicleClientWindow;
@@ -36,16 +37,22 @@ public class Foodsicles extends Module {
     public static final MenuType<FoodsicleCommonWindow>
             FS_WINDOW = null;
 
+
+    @ObjectHolder("foodsicle_grip")
+    public static final CustomItem FS_SICLEGRIP = null;
+
+    @ObjectHolder("foodsicle_face")
+    public static final CustomItem FS_SICLEFACE = null;
+
+
     public static CreativeTab creativeTab;
 
     public Foodsicles() {
         creativeTab = new CreativeTab("foodsicles");
 
-        Registry.register("foodsicle", ()
-                -> new Foodsicle(new Variables()
-                .setStackSize(1)
-                .setCreativeTab(creativeTab))
-        );
+        Registry.register("foodsicle", () -> new Foodsicle(new Variables().setStackSize(1).setCreativeTab(creativeTab)));
+        Registry.register("foodsicle_grip", () -> new CustomItem(new Variables().setStackSize(16).setCreativeTab(creativeTab)));
+        Registry.register("foodsicle_face", () -> new CustomItem(new Variables().setStackSize(16).setCreativeTab(creativeTab)));
 
         Registry.register("foodsicle", ()
                 -> IForgeMenuType.create((windowId, inventory, data)

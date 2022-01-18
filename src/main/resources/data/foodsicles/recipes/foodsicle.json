@@ -1,19 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "I I",
-    "IPI",
-    "RIR"
+    "F",
+    "G"
   ],
   "key": {
-    "R": {
-      "item": "minecraft:redstone"
+    "F": {
+      "item": "foodsicles:foodsicle_face"
     },
-    "I": {
-      "item": "minecraft:copper_ingot"
-    },
-    "P": {
-      "tag": "minecraft:planks"
+    "G": {
+      "item": "foodsicles:foodsicle_grip"
     }
   },
   "result": {

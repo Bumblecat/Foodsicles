@@ -1,5 +1,9 @@
 {
   "itemGroup.foodsicles": "Foodsicles",
+
   "item.foodsicles.foodsicle": "Foodsicle",
+  "item.foodsicles.foodsicle_grip": "Foodsicle Grip",
+  "item.foodsicles.foodsicle_face": "Foodsicle Face",
+
   "enchantment.foodsicles.foodsicle": "Auto Feeding"
 }
