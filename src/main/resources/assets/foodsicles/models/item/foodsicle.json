@@ -2,7 +2,8 @@
 	"parent": "bumblecore:item/default",
 	"textures": {
 		"grip": "foodsicles:item/foodsicle_grip",
-		"face": "foodsicles:item/foodsicle_face"
+		"face": "foodsicles:item/foodsicle_face",
+		"particle": "foodsicles:item/foodsicle_face"
 	},
 	"elements": [
 		{
