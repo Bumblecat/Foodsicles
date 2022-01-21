@@ -3,12 +3,12 @@ package dev.bumblecat.foodsicles.common.objects.items;
 import dev.bumblecat.bumblecore.common.objects.items.IEnchantable;
 import dev.bumblecat.bumblecore.common.objects.items.IImpractical;
 import dev.bumblecat.bumblecore.common.storage.IInventoryProvider;
-import dev.bumblecat.bumblecore.common.windows.ICommonWindowProvider;
+import dev.bumblecat.bumblecore.common.windows.IWindowProvider;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public interface IFoodsicle extends ICommonWindowProvider, IInventoryProvider,
+public interface IFoodsicle extends IWindowProvider, IInventoryProvider,
         IEnchantable, IImpractical {
 
     /**
