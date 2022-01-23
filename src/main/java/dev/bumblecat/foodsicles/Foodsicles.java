@@ -12,6 +12,7 @@ import dev.bumblecat.foodsicles.common.network.AutoFeedEnabledPacket;
 import dev.bumblecat.foodsicles.common.objects.items.Foodsicle;
 import dev.bumblecat.foodsicles.common.trading.VillagerTrading;
 import dev.bumblecat.foodsicles.common.windows.FoodsicleCommonWindow;
+import dev.bumblecat.foodsicles.config.Configuration;
 
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.inventory.MenuType;
@@ -48,6 +49,8 @@ public class Foodsicles extends Module {
     public static CreativeTab creativeTab;
 
     public Foodsicles() {
+        Configuration.initialize();
+
         creativeTab = new CreativeTab("foodsicles");
 
         Registry.register("foodsicle", () -> new Foodsicle(new Variables().setStackSize(1).setCreativeTab(creativeTab)));

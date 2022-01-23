@@ -4,6 +4,7 @@ import dev.bumblecat.bumblecore.common.storage.IInventory;
 import dev.bumblecat.bumblecore.common.windows.CommonWindow;
 import dev.bumblecat.foodsicles.Foodsicles;
 import dev.bumblecat.foodsicles.common.objects.items.IFoodsicle;
+import dev.bumblecat.foodsicles.config.Configuration;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import java.awt.*;
+import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,13 +43,28 @@ public class FoodsicleCommonWindow extends CommonWindow {
                 this.addSlot(new SlotItemHandler(this.inventory, i, 8 + (i % 9) * 18, 18) {
                     @Override
                     public boolean mayPlace(@NotNull ItemStack stack) {
-                        return stack.getItem().getFoodProperties() != null;
+                        return isValidItem(stack); //stack.getItem().getFoodProperties() != null;
                     }
                 });
             }
         }
 
         this.addPlayerInventory(new Point(0, 44));
+    }
+
+    /**
+     * @param stack
+     *
+     * @return
+     */
+    public boolean isValidItem(ItemStack stack) {
+        String registryName = Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
+        if (stack.getItem().getFoodProperties() != null)
+            if (Configuration.CommonSettings.objects.get().contains(registryName))
+                return !Configuration.CommonSettings.reverse.get();
+            else
+                return true;
+        return false;
     }
 
     @Override

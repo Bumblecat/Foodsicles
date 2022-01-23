@@ -1,7 +1,8 @@
 package dev.bumblecat.foodsicles.common.objects.items;
 
 import dev.bumblecat.bumblecore.client.objects.items.IDyeableItem;
-import dev.bumblecat.bumblecore.common.objects.*;
+import dev.bumblecat.bumblecore.common.objects.InteractionResult;
+import dev.bumblecat.bumblecore.common.objects.ObjectEventItemArgs;
 import dev.bumblecat.bumblecore.common.objects.items.CustomItem;
 import dev.bumblecat.bumblecore.common.objects.items.Variables;
 import dev.bumblecat.bumblecore.common.storage.IInventory;
@@ -16,9 +17,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
@@ -32,7 +31,6 @@ import net.minecraftforge.network.NetworkHooks;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
@@ -44,192 +42,81 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
         super(variables);
     }
 
-
+    /**
+     * @param stack
+     * @param arguments
+     *
+     * @return
+     */
     @Override
     public InteractionResult<ItemStack> onInteraction(ItemStack stack, ObjectEventItemArgs arguments) {
         if (arguments.getEventLevel().isClientSide())
-            return new InteractionResult<>(stack, InteractionResultType.SUCCESS);
+            return InteractionResult.proceed(stack);
 
         if (arguments.getEventHand() == InteractionHand.MAIN_HAND) {
             if (!arguments.getEventPlayer().isSecondaryUseActive()) {
                 if (arguments.getEventPlayer().getFoodData().needsFood()) {
 
+                    /**
+                     * Check if the inventory is not empty.
+                     * If the inventory is empty, play a soundeffect. If not, start consuming!
+                     *
+                     * @todo work on soundevents. find a sound suitable for something that is empty.
+                     */
                     if (!getInventory(arguments.getEventPlayer().getItemInHand(arguments.getEventHand())).isEmpty()) {
                         arguments.getEventPlayer().startUsingItem(arguments.getEventHand());
                     } else {
-
                         arguments.getEventLevel().playSound(null,
                                 arguments.getEventPlayer().getX(), arguments.getEventPlayer().getY(), arguments.getEventPlayer().getZ(),
-                                SoundEvents.SHOVEL_FLATTEN, SoundSource.PLAYERS, 0.1F, .01F);
+                                SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 0.1F, .03F);
                     }
+                    return InteractionResult.consume(stack);
                 }
-
-                return new InteractionResult<>(stack, InteractionResultType.CONSUME);
-
             } else {
+
+                /**
+                 * Open the inventory window.
+                 */
                 if (arguments.getEventPlayer() instanceof ServerPlayer) {
                     NetworkHooks.openGui((ServerPlayer) arguments.getEventPlayer(), this);
                 }
             }
         }
-
-
-        return new InteractionResult<>(stack, InteractionResultType.FAIL); //super.onInteraction(stack, arguments);
+        return InteractionResult.proceed(stack);
     }
 
+    /**
+     * @param stack
+     * @param arguments
+     *
+     * @return
+     */
     @Override
     public InteractionResult<ItemStack> onInteractionFinished(ItemStack stack, ObjectEventItemArgs arguments) {
+        if (arguments.getEventLevel().isClientSide())
+            return InteractionResult.proceed(stack);
 
+        /**
+         * If the player still requires food, consume!
+         */
         if (arguments.getEventPlayer().getFoodData().needsFood()) {
             if (!getInventory(stack).isEmpty()) {
 
                 ItemStack returned = getEdibleBestInSlot(stack, arguments.getEventPlayer(), true)
                         .finishUsingItem(arguments.getEventLevel(), arguments.getEventPlayer());
 
+                /**
+                 * If the Item returns another item, like .. an empty bowl?
+                 */
                 if (!(returned == ItemStack.EMPTY)) {
                     ItemHandlerHelper.giveItemToPlayer(arguments.getEventPlayer(), returned);
                 }
             }
         }
 
-        return super.onInteractionFinished(stack, arguments);
+        return InteractionResult.proceed(stack);
     }
 
-
-    @Override
-    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-        if (entity instanceof Player && !((Player)entity).getFoodData().needsFood())
-            return false;
-
-        return super.onEntitySwing(stack, entity);
-    }
-
-    /**
-     * @param level
-     * @param player
-     * @param hand
-     * @return
-     */
-    //@Override
-    public @NotNull
-    InteractionResultHolder<ItemStack> onInteract2(Level level, Player player, InteractionHand hand) {
-        if (level.isClientSide())
-            return InteractionResultHolder.pass(player.getItemInHand(hand));
-
-        if (hand == InteractionHand.MAIN_HAND) {
-            if (!player.isSecondaryUseActive()) {
-                if (player.getFoodData().needsFood()) {
-
-                    /**
-                     * Check if the inventory is not empty.
-                     * If the inventory is empty, play a soundeffect. If not, start consuming!
-                     */
-                    if (!getInventory(player.getItemInHand(hand)).isEmpty()) {
-                        player.startUsingItem(hand);
-                    } else {
-                        level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                                //SoundEvents.MAGMA_CUBE_HURT_SMALL,
-                                SoundEvents.SHOVEL_FLATTEN,
-                                SoundSource.PLAYERS, 0.1F, .01F);
-                    }
-
-                    return InteractionResultHolder.consume(player.getItemInHand(hand));
-                }
-            } else {
-                /**
-                 * Open the inventory window.
-                 */
-                if (player instanceof ServerPlayer) {
-                    NetworkHooks.openGui((ServerPlayer) player, this);
-                }
-            }
-        }
-
-        return InteractionResultHolder.pass(player.getItemInHand(hand));
-    }
-
-
-//    @Override
-//    public InteractionResult<ItemStack> onInteraction(InteractionEvent<?> event) {
-//        InteractionEventArgs arguments = (InteractionEventArgs) event.getArguments();
-//
-//        if (arguments.getEventLevel().isClientSide())
-//            return new InteractionResult<>(arguments.getEventPlayer().getItemInHand(arguments.getEventHand()), InteractionResultType.SUCCESS);
-//
-//        if (arguments.getEventHand() == InteractionHand.MAIN_HAND) {
-//            if (!arguments.getEventPlayer().isSecondaryUseActive()) {
-//
-//                if (arguments.getEventPlayer().getFoodData().needsFood()) {
-//
-//                    if (!getInventory(arguments.getEventPlayer().getItemInHand(arguments.getEventHand())).isEmpty()) {
-//                        arguments.getEventPlayer().startUsingItem(arguments.getEventHand());
-//                    } else {
-//                        //
-//                    }
-//
-//                    return new InteractionResult<>(arguments.getEventPlayer().getItemInHand(arguments.getEventHand()), InteractionResultType.CONSUME);
-//                }
-//            } else {
-//                if (arguments.getEventPlayer() instanceof ServerPlayer) {
-//                    NetworkHooks.openGui((ServerPlayer) arguments.getEventPlayer(), this);
-//                }
-//            }
-//        }
-//        return super.onInteraction(event);
-//    }
-//
-//    @Override
-//    public InteractionResult<ItemStack> onInteractionFinished(InteractionEvent<?> event) {
-//        InteractionEventArgs arguments = (InteractionEventArgs) event.getArguments();
-//
-//        if (arguments.getEventPlayer().getFoodData().needsFood()) {
-//            if (!getInventory((ItemStack) event.getObject()).isEmpty()) {
-//
-//                ItemStack returned = getEdibleBestInSlot((ItemStack) event.getObject(), arguments.getEventPlayer(), true)
-//                        .finishUsingItem(arguments.getEventLevel(), arguments.getEventPlayer());
-//
-//                if (!(returned == ItemStack.EMPTY)) {
-//                    ItemHandlerHelper.giveItemToPlayer(arguments.getEventPlayer(), returned);
-//                }
-//            }
-//        }
-//
-//        return super.onInteractionFinished(event);
-//    }
-
-    /**
-     * @param stack
-     * @param level
-     * @param entity
-     * @return
-     */
-    //@Override
-    public ItemStack finishUsingItem2(ItemStack stack, Level level, LivingEntity entity) {
-
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
-
-            /**
-             * If the player still requires food, consume!
-             */
-            if (player.getFoodData().needsFood()) {
-                if (!getInventory(stack).isEmpty()) {
-
-                    ItemStack returned = getEdibleBestInSlot(stack, player, true)
-                            .finishUsingItem(level, player);
-
-                    /**
-                     * If the Item returned another item, like .. an empty bowl?
-                     */
-                    if (!(returned == ItemStack.EMPTY)) {
-                        ItemHandlerHelper.giveItemToPlayer(player, returned);
-                    }
-                }
-            }
-        }
-
-        return super.finishUsingItem(stack, level, entity);
-    }
 
     /**
      * @param stack
@@ -280,7 +167,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
      */
     @Override
     public void onCraftedBy(ItemStack stack, Level level, Player player) {
-        // show the durability bar upon creation.
         stack.getOrCreateTagElement("storage");
         super.onCraftedBy(stack, level, player);
     }
@@ -343,6 +229,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
      * @param stack
      * @param player
      * @param extract
+     *
      * @return
      */
     @Override
@@ -366,6 +253,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
+     *
      * @return
      */
     @Override
@@ -375,6 +263,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
+     *
      * @return
      */
     @Override
@@ -384,6 +273,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
+     *
      * @return
      */
     @Override
@@ -401,6 +291,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
+     *
      * @return
      */
     @Override
@@ -410,6 +301,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
+     *
      * @return
      */
     @Override
@@ -422,25 +314,28 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
+     *
      * @return
      */
     @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round(13F * ((float) getInventory(stack).getObjectCount() / getMaxDamage(stack)));
+        return Math.round(13F * ((float) getInventory(stack).getObjectCountByStackSize() / getMaxDamage(stack)));
     }
 
     /**
      * @param stack
+     *
      * @return
      */
     @Override
     public int getBarColor(ItemStack stack) {
-        return Mth.hsvToRgb(Math.max(0F, (float) (getInventory(stack).getObjectCount() - stack.getDamageValue()) / getMaxDamage(stack)) / 3F, 1F, 1F);
+        return Mth.hsvToRgb(Math.max(0F, (float) (getInventory(stack).getObjectCountByStackSize() - stack.getDamageValue()) / getMaxDamage(stack)) / 3F, 1F, 1F);
     }
 
 
     /**
      * @param stack
+     *
      * @return
      */
     public boolean getIsAutofeeding(ItemStack stack) {
@@ -460,6 +355,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
+     *
      * @return
      */
     @Override
@@ -484,6 +380,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
      * @param windowId
      * @param inventory
      * @param player
+     *
      * @return
      */
     @Override
@@ -501,7 +398,9 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
+     *
      * @return
+     *
      * @todo create the dyeable recipes.
      */
     @Override
