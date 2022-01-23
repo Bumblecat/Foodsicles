@@ -1,6 +1,7 @@
 package dev.bumblecat.foodsicles.common.objects.items;
 
 import dev.bumblecat.bumblecore.client.objects.items.IDyeableItem;
+import dev.bumblecat.bumblecore.common.objects.*;
 import dev.bumblecat.bumblecore.common.objects.items.CustomItem;
 import dev.bumblecat.bumblecore.common.objects.items.Variables;
 import dev.bumblecat.bumblecore.common.storage.IInventory;
@@ -44,16 +45,74 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
     }
 
 
+    @Override
+    public InteractionResult<ItemStack> onInteraction(ItemStack stack, ObjectEventItemArgs arguments) {
+        if (arguments.getEventLevel().isClientSide())
+            return new InteractionResult<>(stack, InteractionResultType.SUCCESS);
+
+        if (arguments.getEventHand() == InteractionHand.MAIN_HAND) {
+            if (!arguments.getEventPlayer().isSecondaryUseActive()) {
+                if (arguments.getEventPlayer().getFoodData().needsFood()) {
+
+                    if (!getInventory(arguments.getEventPlayer().getItemInHand(arguments.getEventHand())).isEmpty()) {
+                        arguments.getEventPlayer().startUsingItem(arguments.getEventHand());
+                    } else {
+
+                        arguments.getEventLevel().playSound(null,
+                                arguments.getEventPlayer().getX(), arguments.getEventPlayer().getY(), arguments.getEventPlayer().getZ(),
+                                SoundEvents.SHOVEL_FLATTEN, SoundSource.PLAYERS, 0.1F, .01F);
+                    }
+                }
+
+                return new InteractionResult<>(stack, InteractionResultType.CONSUME);
+
+            } else {
+                if (arguments.getEventPlayer() instanceof ServerPlayer) {
+                    NetworkHooks.openGui((ServerPlayer) arguments.getEventPlayer(), this);
+                }
+            }
+        }
+
+
+        return new InteractionResult<>(stack, InteractionResultType.FAIL); //super.onInteraction(stack, arguments);
+    }
+
+    @Override
+    public InteractionResult<ItemStack> onInteractionFinished(ItemStack stack, ObjectEventItemArgs arguments) {
+
+        if (arguments.getEventPlayer().getFoodData().needsFood()) {
+            if (!getInventory(stack).isEmpty()) {
+
+                ItemStack returned = getEdibleBestInSlot(stack, arguments.getEventPlayer(), true)
+                        .finishUsingItem(arguments.getEventLevel(), arguments.getEventPlayer());
+
+                if (!(returned == ItemStack.EMPTY)) {
+                    ItemHandlerHelper.giveItemToPlayer(arguments.getEventPlayer(), returned);
+                }
+            }
+        }
+
+        return super.onInteractionFinished(stack, arguments);
+    }
+
+
+    @Override
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+        if (entity instanceof Player && !((Player)entity).getFoodData().needsFood())
+            return false;
+
+        return super.onEntitySwing(stack, entity);
+    }
+
     /**
      * @param level
      * @param player
      * @param hand
-     *
      * @return
      */
-    @Override
+    //@Override
     public @NotNull
-    InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    InteractionResultHolder<ItemStack> onInteract2(Level level, Player player, InteractionHand hand) {
         if (level.isClientSide())
             return InteractionResultHolder.pass(player.getItemInHand(hand));
 
@@ -89,15 +148,63 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
         return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
+
+//    @Override
+//    public InteractionResult<ItemStack> onInteraction(InteractionEvent<?> event) {
+//        InteractionEventArgs arguments = (InteractionEventArgs) event.getArguments();
+//
+//        if (arguments.getEventLevel().isClientSide())
+//            return new InteractionResult<>(arguments.getEventPlayer().getItemInHand(arguments.getEventHand()), InteractionResultType.SUCCESS);
+//
+//        if (arguments.getEventHand() == InteractionHand.MAIN_HAND) {
+//            if (!arguments.getEventPlayer().isSecondaryUseActive()) {
+//
+//                if (arguments.getEventPlayer().getFoodData().needsFood()) {
+//
+//                    if (!getInventory(arguments.getEventPlayer().getItemInHand(arguments.getEventHand())).isEmpty()) {
+//                        arguments.getEventPlayer().startUsingItem(arguments.getEventHand());
+//                    } else {
+//                        //
+//                    }
+//
+//                    return new InteractionResult<>(arguments.getEventPlayer().getItemInHand(arguments.getEventHand()), InteractionResultType.CONSUME);
+//                }
+//            } else {
+//                if (arguments.getEventPlayer() instanceof ServerPlayer) {
+//                    NetworkHooks.openGui((ServerPlayer) arguments.getEventPlayer(), this);
+//                }
+//            }
+//        }
+//        return super.onInteraction(event);
+//    }
+//
+//    @Override
+//    public InteractionResult<ItemStack> onInteractionFinished(InteractionEvent<?> event) {
+//        InteractionEventArgs arguments = (InteractionEventArgs) event.getArguments();
+//
+//        if (arguments.getEventPlayer().getFoodData().needsFood()) {
+//            if (!getInventory((ItemStack) event.getObject()).isEmpty()) {
+//
+//                ItemStack returned = getEdibleBestInSlot((ItemStack) event.getObject(), arguments.getEventPlayer(), true)
+//                        .finishUsingItem(arguments.getEventLevel(), arguments.getEventPlayer());
+//
+//                if (!(returned == ItemStack.EMPTY)) {
+//                    ItemHandlerHelper.giveItemToPlayer(arguments.getEventPlayer(), returned);
+//                }
+//            }
+//        }
+//
+//        return super.onInteractionFinished(event);
+//    }
+
     /**
      * @param stack
      * @param level
      * @param entity
-     *
      * @return
      */
-    @Override
-    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+    //@Override
+    public ItemStack finishUsingItem2(ItemStack stack, Level level, LivingEntity entity) {
 
         if (entity instanceof Player) {
             Player player = (Player) entity;
@@ -236,7 +343,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
      * @param stack
      * @param player
      * @param extract
-     *
      * @return
      */
     @Override
@@ -260,7 +366,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     @Override
@@ -270,7 +375,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     @Override
@@ -280,7 +384,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     @Override
@@ -298,7 +401,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     @Override
@@ -308,7 +410,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     @Override
@@ -321,7 +422,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     @Override
@@ -331,7 +431,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     @Override
@@ -342,7 +441,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     public boolean getIsAutofeeding(ItemStack stack) {
@@ -362,7 +460,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
      */
     @Override
@@ -387,7 +484,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
      * @param windowId
      * @param inventory
      * @param player
-     *
      * @return
      */
     @Override
@@ -405,9 +501,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
     /**
      * @param stack
-     *
      * @return
-     *
      * @todo create the dyeable recipes.
      */
     @Override
