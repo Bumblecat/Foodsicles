@@ -137,7 +137,7 @@ jar {
     exclude "**/*.psd"
     exclude "**/*.cubik"
 
-    destinationDirectory = file('../out')
+    destinationDirectory = file("../out/${mc_version}/${project_title}/${major_version}.${minor_version}.${build_version}")
 }
 
 // Example configuration to allow publishing using the maven-publish plugin
