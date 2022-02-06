@@ -23,6 +23,6 @@ issueTrackerURL = "https://bumblecat.dev/issues/foodsicles"
 [[dependencies.foodsicles]]
     modId = "bumblecore"
     mandatory = true
-    versionRange = "[1.0,)"
+    versionRange = "[1.0.5,)"
     ordering = "AFTER"
     side = "BOTH"
