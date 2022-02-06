@@ -9,7 +9,7 @@ issueTrackerURL = "https://bumblecat.dev/issues/foodsicles"
     displayName = "Foodsicles"
     updateJSONURL = "https://bumblecat.dev/version/foodsicles"
     displayURL = "https://bumblecat.dev/"
-    logoFile = "foodsicles.png"
+    logoFile = "logo.png"
     authors = "Baijson"
     description = ''' Your regular dose of nutrition.. ON A STICK!! '''
 
