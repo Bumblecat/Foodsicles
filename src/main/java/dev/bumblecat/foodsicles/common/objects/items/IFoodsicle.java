@@ -12,6 +12,18 @@ public interface IFoodsicle extends IWindowProvider, IInventoryProvider,
         IEnchantable, IImpractical {
 
     /**
+     *
+     * @return
+     */
+    FoodsicleType getUpgradeType();
+
+    /**
+     *
+     * @return
+     */
+    boolean getIsUpgradable();
+
+    /**
      * @param itemStack
      * @param player
      *
@@ -50,4 +62,17 @@ public interface IFoodsicle extends IWindowProvider, IInventoryProvider,
      * @return
      */
     boolean getIsAutofeeding(ItemStack stack);
+
+    /**
+     * @param stack
+     *
+     * @return
+     */
+    int getColorValue(ItemStack stack);
+
+    /**
+     * @param stack
+     * @param color
+     */
+    void setColorValue(ItemStack stack, int color);
 }

@@ -21,6 +21,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
@@ -35,11 +36,22 @@ import org.jetbrains.annotations.Nullable;
 
 public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
 
+    private final FoodsicleType foodsicleType;
+
     /**
      * @param variables
      */
     public Foodsicle(Variables variables) {
+        this(variables, null);
+    }
+
+    /**
+     * @param variables
+     * @param foodsicleType
+     */
+    public Foodsicle(Variables variables, FoodsicleType foodsicleType) {
         super(variables);
+        this.foodsicleType = foodsicleType;
     }
 
     /**
@@ -171,6 +183,19 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
         super.onCraftedBy(stack, level, player);
     }
 
+    /**
+     * @return
+     */
+    public FoodsicleType getUpgradeType() {
+        return this.foodsicleType == null ? FoodsicleType.Default : this.foodsicleType;
+    }
+
+    /**
+     * @return
+     */
+    public boolean getIsUpgradable() {
+        return this.foodsicleType != null;
+    }
 
     /**
      * @return
@@ -296,7 +321,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
      */
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return 9 * 64;
+        return this.getUpgradeType().getValue() * 64;
     }
 
     /**
@@ -352,7 +377,6 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
         stack.getOrCreateTagElement("enabled").putBoolean("value", value);
     }
 
-
     /**
      * @param stack
      *
@@ -363,7 +387,10 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
         if (stack.isEmpty())
             return null;
 
-        IInventory inventory = new InventoryHandler(9) {
+        int size = stack.getItem() instanceof Foodsicle ?
+                ((Foodsicle) stack.getItem()).getUpgradeType().getValue() : 9;
+
+        IInventory inventory = new InventoryHandler(size) {
             @Override
             protected void onContentsChanged(int slot) {
                 stack.getOrCreateTag().put("storage", serializeNBT());
@@ -400,12 +427,42 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
      * @param stack
      *
      * @return
-     *
-     * @todo create the dyeable recipes.
      */
     @Override
     public ItemColor getColor(@Nullable ItemStack stack) {
-        return null;
+
+        return new ItemColor() {
+            @Override
+            public int getColor(ItemStack stack, int index) {
+                return index > 0 ? index > 1 ? getDyedColor(stack) : getTypeColor(stack) : DyeColor.BROWN.getTextColor();
+            }
+
+            private int getTypeColor(ItemStack stack) {
+                return ((IFoodsicle) stack.getItem()).getUpgradeType().getColor();
+            }
+
+            private int getDyedColor(ItemStack stack) {
+                return ((IFoodsicle) stack.getItem()).getColorValue(stack);
+            }
+        };
+
+    }
+
+    /**
+     * @param stack
+     *
+     * @return
+     */
+    public int getColorValue(ItemStack stack) {
+        return stack.getTagElement("color") != null ? stack.getTagElement("color").getInt("value") : 10511680;
+    }
+
+    /**
+     * @param stack
+     * @param color
+     */
+    public void setColorValue(ItemStack stack, int color) {
+        stack.getOrCreateTagElement("color").putInt("value", color);
     }
 
     /**

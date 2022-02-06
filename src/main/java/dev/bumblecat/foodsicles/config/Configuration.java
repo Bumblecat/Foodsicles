@@ -5,7 +5,6 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Configuration {
 

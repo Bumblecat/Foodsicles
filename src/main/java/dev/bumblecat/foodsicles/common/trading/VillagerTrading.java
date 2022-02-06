@@ -1,6 +1,6 @@
 package dev.bumblecat.foodsicles.common.trading;
 
-import dev.bumblecat.foodsicles.Foodsicles;
+import dev.bumblecat.foodsicles.common.ObjectHolders;
 
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.ItemStack;
@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber
 public class VillagerTrading {
+
     /**
      * @param event
      */
@@ -20,9 +21,9 @@ public class VillagerTrading {
     public void onVillagerTradesEvent(VillagerTradesEvent event) {
         if (event.getType() == VillagerProfession.FARMER) {
             event.getTrades().get(2).add(new BasicItemListing(6,
-                    new ItemStack(Foodsicles.FS_OBJECT, 1), 1, 2));
+                    new ItemStack(ObjectHolders.FS_DEFAULT, 1), 1, 2));
             event.getTrades().get(4).add(new BasicItemListing(3,
-                    new ItemStack(Foodsicles.FS_OBJECT, 1), 1, 2));
+                    new ItemStack(ObjectHolders.FS_DEFAULT, 1), 1, 2));
         }
     }
 
@@ -32,6 +33,6 @@ public class VillagerTrading {
     @SubscribeEvent
     public void onWandererTradesEvent(WandererTradesEvent event) {
         event.getRareTrades().add(new BasicItemListing(3,
-                new ItemStack(Foodsicles.FS_OBJECT, 1), 1, 2));
+                new ItemStack(ObjectHolders.FS_DEFAULT, 1), 1, 2));
     }
 }

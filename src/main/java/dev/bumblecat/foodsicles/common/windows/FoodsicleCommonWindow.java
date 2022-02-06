@@ -2,7 +2,7 @@ package dev.bumblecat.foodsicles.common.windows;
 
 import dev.bumblecat.bumblecore.common.storage.IInventory;
 import dev.bumblecat.bumblecore.common.windows.CommonWindow;
-import dev.bumblecat.foodsicles.Foodsicles;
+import dev.bumblecat.foodsicles.common.ObjectHolders;
 import dev.bumblecat.foodsicles.common.objects.items.IFoodsicle;
 import dev.bumblecat.foodsicles.config.Configuration;
 
@@ -15,7 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import java.awt.*;
-import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +30,7 @@ public class FoodsicleCommonWindow extends CommonWindow {
      * @param inventory
      */
     public FoodsicleCommonWindow(int windowId, Inventory inventory) {
-        super(Foodsicles.FS_WINDOW, windowId, inventory, 9);
+        super(ObjectHolders.FS_WINDOW, windowId, inventory, 9);
 
         this.itemStack = inventory.player.getMainHandItem();
         this.activeSlot = inventory.selected;
@@ -39,17 +38,33 @@ public class FoodsicleCommonWindow extends CommonWindow {
         if (this.itemStack.getItem() instanceof IFoodsicle) {
             this.inventory = ((IFoodsicle) this.itemStack.getItem()).getInventory(this.itemStack);
 
-            for (int i = 0; i < 9; ++i) {
-                this.addSlot(new SlotItemHandler(this.inventory, i, 8 + (i % 9) * 18, 18) {
-                    @Override
-                    public boolean mayPlace(@NotNull ItemStack stack) {
-                        return isValidItem(stack); //stack.getItem().getFoodProperties() != null;
-                    }
-                });
-            }
-        }
+            int slots = ((IFoodsicle) this.itemStack.getItem()).getUpgradeType().getValue();
 
-        this.addPlayerInventory(new Point(0, 44));
+            for (int i = 0; i < (slots / 9); ++i) {
+                for (int j = 0; j < 9; ++j) {
+
+                    this.addSlot(new SlotItemHandler(this.inventory, j + i * 9, 8 + (j % 9) * 18, 18 + (i % 9) * 18) {
+                        @Override
+                        public boolean mayPlace(@NotNull ItemStack stack) {
+                            return isValidItem(stack); //stack.getItem().getFoodProperties() != null;
+                        }
+                    });
+
+                }
+            }
+
+
+//            for (int i = 0; i < slots; ++i) {
+//                this.addSlot(new SlotItemHandler(this.inventory, i, 8 + (i % 9) * 18, 18) {
+//                    @Override
+//                    public boolean mayPlace(@NotNull ItemStack stack) {
+//                        return isValidItem(stack); //stack.getItem().getFoodProperties() != null;
+//                    }
+//                });
+//            }
+
+            this.addPlayerInventory(new Point(0, 44 + (((slots / 9) * 18) - 18)));
+        }
     }
 
     /**
@@ -58,7 +73,7 @@ public class FoodsicleCommonWindow extends CommonWindow {
      * @return
      */
     public boolean isValidItem(ItemStack stack) {
-        String registryName = Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
+        String registryName = java.util.Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
         if (stack.getItem().getFoodProperties() != null)
             if (Configuration.CommonSettings.objects.get().contains(registryName))
                 return !Configuration.CommonSettings.reverse.get();

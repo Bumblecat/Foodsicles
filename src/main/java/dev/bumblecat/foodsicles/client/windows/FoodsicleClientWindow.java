@@ -37,7 +37,9 @@ public class FoodsicleClientWindow extends ClientWindow<FoodsicleCommonWindow> {
      */
     private void construct() {
         if (this.itemStack != null && this.itemStack.getItem() instanceof IFoodsicle) {
-            this.setSize(this.itemStack.isEnchanted() ? 208 : 176, 144);
+            int slots = ((IFoodsicle) this.itemStack.getItem()).getUpgradeType().getValue();
+
+            this.setSize(this.itemStack.isEnchanted() ? 208 : 176, 144 + (((slots / 9) * 18) - 18));
         }
     }
 
@@ -47,8 +49,6 @@ public class FoodsicleClientWindow extends ClientWindow<FoodsicleCommonWindow> {
     @Override
     public void onWindowCreated() {
         super.onWindowCreated();
-
-        //this.setPlayerInventoryVisible();
     }
 
     /**
@@ -58,20 +58,41 @@ public class FoodsicleClientWindow extends ClientWindow<FoodsicleCommonWindow> {
     public void onWindowLoading() {
         super.onWindowLoading();
 
-        for (int i = 0; i < 9; ++i) {
-            this.attach(new Aperture(this, new Rectangle((i * 18) + 7, 17, 18, 18))
-                    .setTexture3x3()
-                    .setVisible()
-            );
+        if (this.itemStack != null && this.itemStack.getItem() instanceof IFoodsicle) {
+            int slots = ((IFoodsicle) this.itemStack.getItem()).getUpgradeType().getValue();
+
+            for (int i = 0; i < (slots / 9); ++i) {
+                for (int j = 0; j < 9; ++j) {
+                    this.attach(new Aperture(this, new Rectangle(7 + (j % 9) * 18, 17 + (i % 9) * 18, 18, 18))
+                            .setTexture3x3().setVisible()
+                    );
+                }
+            }
+
+            if (this.itemStack.isEnchanted()) {
+                Lever lever;
+                this.attach((lever = new Lever(this, new Rectangle(184, 64 + (((slots / 9) * 18) - 18), 16, 48)))
+                        .onMouseRelease(() -> onLeverClicked(lever, itemStack)).setVisible()
+                );
+                lever.setValue(((IFoodsicle) this.itemStack.getItem()).getIsAutofeeding(this.itemStack));
+            }
         }
 
-        if (this.itemStack != null && this.itemStack.isEnchanted()) {
-            Lever lever;
-            this.attach((lever = new Lever(this, new Rectangle(184, 64, 16, 48)))
-                    .onMouseRelease(() -> onLeverClicked(lever, itemStack)).setVisible());
 
-            lever.setValue(((IFoodsicle) this.itemStack.getItem()).getIsAutofeeding(this.itemStack));
-        }
+//        for (int i = 0; i < 9; ++i) {
+//            this.attach(new Aperture(this, new Rectangle((i * 18) + 7, 17, 18, 18))
+//                    .setTexture3x3()
+//                    .setVisible()
+//            );
+//        }
+//
+//        if (this.itemStack != null && this.itemStack.isEnchanted()) {
+//            Lever lever;
+//            this.attach((lever = new Lever(this, new Rectangle(184, 64, 16, 48)))
+//                    .onMouseRelease(() -> onLeverClicked(lever, itemStack)).setVisible());
+//
+//            lever.setValue(((IFoodsicle) this.itemStack.getItem()).getIsAutofeeding(this.itemStack));
+//        }
     }
 
     /**
