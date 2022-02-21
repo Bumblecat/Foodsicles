@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
+import net.minecraftforge.api.distmarker.*;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.network.NetworkHooks;
 
@@ -429,6 +430,7 @@ public class Foodsicle extends CustomItem implements IFoodsicle, IDyeableItem {
      * @return
      */
     @Override
+    @OnlyIn(Dist.CLIENT)
     public ItemColor getColor(@Nullable ItemStack stack) {
 
         return new ItemColor() {
