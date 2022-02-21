@@ -72,27 +72,11 @@ public class FoodsicleClientWindow extends ClientWindow<FoodsicleCommonWindow> {
             if (this.itemStack.isEnchanted()) {
                 Lever lever;
                 this.attach((lever = new Lever(this, new Rectangle(184, 64 + (((slots / 9) * 18) - 18), 16, 48)))
-                        .onMouseRelease(() -> onLeverClicked(lever, itemStack)).setVisible()
-                );
+                        .onMouseRelease(() -> onLeverClicked(lever, itemStack)).setVisible());
+
                 lever.setValue(((IFoodsicle) this.itemStack.getItem()).getIsAutofeeding(this.itemStack));
             }
         }
-
-
-//        for (int i = 0; i < 9; ++i) {
-//            this.attach(new Aperture(this, new Rectangle((i * 18) + 7, 17, 18, 18))
-//                    .setTexture3x3()
-//                    .setVisible()
-//            );
-//        }
-//
-//        if (this.itemStack != null && this.itemStack.isEnchanted()) {
-//            Lever lever;
-//            this.attach((lever = new Lever(this, new Rectangle(184, 64, 16, 48)))
-//                    .onMouseRelease(() -> onLeverClicked(lever, itemStack)).setVisible());
-//
-//            lever.setValue(((IFoodsicle) this.itemStack.getItem()).getIsAutofeeding(this.itemStack));
-//        }
     }
 
     /**
@@ -103,7 +87,6 @@ public class FoodsicleClientWindow extends ClientWindow<FoodsicleCommonWindow> {
         Foodsicles.getNetwork().sendToServer(new AutoFeedEnabledPacket(lever.getValue()));
         ((IFoodsicle) this.itemStack.getItem()).setIsAutofeeding(this.itemStack, lever.getValue());
     }
-
 
     /**
      * @return
